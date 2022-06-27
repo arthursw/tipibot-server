@@ -1,0 +1,76 @@
+{
+	"websocketServerURL": "localhost:6842",
+	"autoConnect": false,
+	"firmware": "Makelangelo",
+	"forceLinearMoves": true,
+	"forceInitialization": true,
+	"enableTouchKeyboard": false,
+	"tipibot": {
+		"width": 1494,
+		"height": 1740,
+		"homeX": 747,
+		"homeY": 1120,
+		"invertMotorLeft": true,
+		"invertMotorRight": false,
+		"drawSpeed": 4000,
+		"maxSpeed": 4000,
+		"acceleration": 374,
+		"stepsPerRev": 200,
+		"microstepResolution": 32,
+		"mmPerRev": 95,
+		"progressiveMicrosteps": false,
+		"penWidth": 1.9125863155569909,
+		"penOffset": 0
+	},
+	"servo": {
+		"speed": 75,
+		"position": {
+			"invert": false,
+			"up": 10,
+			"down": 170,
+			"close": 100,
+			"drop": 170
+		},
+		"delay": {
+			"up": {
+				"before": 0,
+				"after": 0
+			},
+			"down": {
+				"before": 0,
+				"after": 0
+			}
+		}
+	},
+	"drawArea": {
+		"y": 620,
+		"width": 619,
+		"height": 500
+	},
+	"transformMatrix": {
+		"destinationPoints": [
+			559,
+			610.0000000000002,
+			1197,
+			618.0000000000002,
+			1202,
+			1121.9999999999998,
+			562,
+			1119.9999999999998
+		],
+		"apply": false
+	},
+	"plot": {
+		"showPoints": false,
+		"optimizeTrajectories": false,
+		"disableMotorsOnceFinished": false,
+		"flatten": true,
+		"flattenPrecision": 0.25,
+		"subdivide": false,
+		"maxSegmentLength": 10
+	},
+	"feedback": {
+		"enable": false,
+		"rate": 13
+	}
+}
