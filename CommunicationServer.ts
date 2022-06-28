@@ -11,11 +11,21 @@ export class CommunicationServer extends Communication {
         this.onControllerMessage = onControllerMessage
     }
 
+	onMessage(messageObject: any): void {
+		super.onMessage(messageObject)
+		let type = messageObject.type
+		let data = messageObject.data
+		if(type == 'comme-un-dessein') {
+			// data.value
+
+		}
+	}
+
 	connectToSerial() {
 		CommunicationServer.emitter.on('message',  (event:any)=> this.onMessage(event))
-		CommunicationServer.emitter.on('open',  (event:any)=> this.onWebSocketOpen(event))
-		CommunicationServer.emitter.on('close',  (event:any)=> this.onWebSocketClose(event))
-		CommunicationServer.emitter.on('error',  (event:any)=> this.onWebSocketError(event))
+		// CommunicationServer.emitter.on('open',  (event:any)=> this.onWebSocketOpen(event))
+		// CommunicationServer.emitter.on('close',  (event:any)=> this.onWebSocketClose(event))
+		// CommunicationServer.emitter.on('error',  (event:any)=> this.onWebSocketError(event))
 	}
 
 	send(type: string, data: any = null) {

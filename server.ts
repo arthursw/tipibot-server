@@ -1,4 +1,4 @@
-import { copyObjectProperties, Settings } from "./tipibot-controller-gui/ts/Settings";
+import { copyObjectProperties, Settings, document } from "./tipibot-controller-gui/ts/Settings";
 import { CommeUnDessein } from "./tipibot-controller-gui/ts/Plugins/CommeUnDesseinStatic";
 import { CommunicationServer } from "./CommunicationServer";
 import { Calibration } from "./tipibot-controller-gui/ts/CalibrationStatic";
@@ -98,7 +98,7 @@ let closeSerialPortCallback = (result)=> {
 
 let onControllerConnection = (ws)=> {
     wsController = ws
-    ws.on('message', onControllerMessage)
+    ws.on('message', onControllerJSONMessage)
     ws.on('open', onControllerOpen)
     ws.on('close', onControllerClose)
     listSerialPorts()
@@ -110,7 +110,7 @@ let getSerialPortInfo = ()=> {
 }
 
 let onControllerMessage = (type, data)=> {
-    
+    console.log('onControllerMessage', type, data)
     if(type == 'data') {
 
         if(serialPort == null) {
@@ -144,6 +144,19 @@ let onControllerMessage = (type, data)=> {
     }
 }
 
+let onControllerJSONMessage = (messageObject: any)=> {
+    let type = null;
+    let data = null;
+    try {
+        let json = JSON.parse(messageObject);
+        type = json.type;
+        data = json.data;
+        onControllerMessage(type, data)
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 let onControllerOpen = (data)=> {
     console.log('WebSocket opened');
     send(wsController, 'load-settings', Settings);
@@ -155,11 +168,12 @@ let onControllerClose = (data)=> {
 
 let initializeTipibot = ()=> {
 
+    let renderer = new Renderer()
+
     let communication = new CommunicationServer(onControllerMessage)
 
     Calibration.initialize()
     
-    let renderer = new Renderer()
 
     communication.setTipibot(Tipibot.tipibot)
     Tipibot.tipibot.initialize()
@@ -167,6 +181,7 @@ let initializeTipibot = ()=> {
     renderer.centerOnTipibot(Settings.tipibot)
 
     let commeUnDessein = new CommeUnDessein()
+
 }
 
 export let launchServer = (port: number=6842, newSettings: object)=> {
