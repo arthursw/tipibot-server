@@ -1,7 +1,7 @@
-import { copyObjectProperties, Settings, document } from "./tipibot-controller-gui/ts/Settings";
-import { CommeUnDessein } from "./tipibot-controller-gui/ts/Plugins/CommeUnDesseinStatic";
+import { copyObjectProperties, Settings } from "./tipibot-controller-gui/ts/Settings";
+import { CommeUnDesseinServer } from "./CommeUnDesseinServer";
 import { CommunicationServer } from "./CommunicationServer";
-import { Calibration } from "./tipibot-controller-gui/ts/CalibrationStatic";
+// import { Calibration } from "./tipibot-controller-gui/ts/CalibrationStatic";
 import { Tipibot } from "./tipibot-controller-gui/ts/TipibotStatic";
 import { Renderer } from "./tipibot-controller-gui/ts/Renderer";
 import { WebSocket } from 'ws';
@@ -15,6 +15,7 @@ let wsController = null;
 var serialPort = null;
 var serialPorts = [];
 const settingsPath = 'settings.json';
+let commeUnDessein:CommeUnDesseinServer = null
 
 let send = (ws, type, data=null)=> {
     let messageObject = {type: type, data: data, time: Date.now()}
@@ -49,6 +50,7 @@ let serialPortCreationCallback = (err)=> {
 }
 
 let onSerialPortData = (data)=> {
+    console.log('got serial port data', data)
     let message = data.toString('utf8')
     send(wsController, 'data', message)
 }
@@ -99,9 +101,11 @@ let closeSerialPortCallback = (result)=> {
 let onControllerConnection = (ws)=> {
     wsController = ws
     ws.on('message', onControllerJSONMessage)
-    ws.on('open', onControllerOpen)
+    // ws.on('open', onControllerOpen)
     ws.on('close', onControllerClose)
     listSerialPorts()
+    send(wsController, 'load-settings', Settings)
+    commeUnDessein.sendState()
 }
 
 let getSerialPortInfo = ()=> {
@@ -119,10 +123,15 @@ let onControllerMessage = (type, data)=> {
         }
 
         send(wsController, 'sent', data);
+        console.log('send serial port data:', data)
         serialPort.write(data, serialPortWriteCallback);
     
     } else if(type == 'comme-un-dessein-start') {
-        CommeUnDessein.startCommeUnDessein();
+        commeUnDessein.start()
+    } else if(type == 'comme-un-dessein-stop') {
+        commeUnDessein.stopAndClear()
+    } else if(type == 'comme-un-dessein-changed') {
+        commeUnDessein.saveSettings(data.key, data.value)
     } else if(type == 'list') {
         listSerialPorts();
     } else if(type == 'is-connected') {
@@ -157,10 +166,11 @@ let onControllerJSONMessage = (messageObject: any)=> {
     }
 }
 
-let onControllerOpen = (data)=> {
-    console.log('WebSocket opened');
-    send(wsController, 'load-settings', Settings);
-}
+// let onControllerOpen = (data)=> {
+//     console.log('WebSocket opened');
+//     send(wsController, 'load-settings', Settings);
+//     commeUnDessein.sendState()
+// }
 
 let onControllerClose = (data)=> {
     wsController = null;
@@ -170,9 +180,9 @@ let initializeTipibot = ()=> {
 
     let renderer = new Renderer()
 
-    let communication = new CommunicationServer(onControllerMessage)
+    let communication = new CommunicationServer(onControllerMessage, (type:string, data:any)=> send(wsController, type, data))
 
-    Calibration.initialize()
+    // Calibration.initialize()
     
 
     communication.setTipibot(Tipibot.tipibot)
@@ -180,8 +190,7 @@ let initializeTipibot = ()=> {
 
     renderer.centerOnTipibot(Settings.tipibot)
 
-    let commeUnDessein = new CommeUnDessein()
-
+    commeUnDessein = new CommeUnDesseinServer()
 }
 
 export let launchServer = (port: number=6842, newSettings: object)=> {
