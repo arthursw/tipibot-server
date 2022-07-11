@@ -1,7 +1,7 @@
 import { copyObjectProperties, Settings } from "./tipibot-controller-gui/ts/Settings";
 import { CommeUnDesseinServer } from "./CommeUnDesseinServer";
 import { CommunicationServer } from "./CommunicationServer";
-// import { Calibration } from "./tipibot-controller-gui/ts/CalibrationStatic";
+import { Calibration } from "./tipibot-controller-gui/ts/CalibrationStatic";
 import { Tipibot } from "./tipibot-controller-gui/ts/TipibotStatic";
 import { Renderer } from "./tipibot-controller-gui/ts/Renderer";
 import { WebSocket } from 'ws';
@@ -182,7 +182,7 @@ let initializeTipibot = ()=> {
 
     let communication = new CommunicationServer(onControllerMessage, (type:string, data:any)=> send(wsController, type, data))
 
-    // Calibration.initialize()
+    Calibration.initialize()
     
 
     communication.setTipibot(Tipibot.tipibot)
